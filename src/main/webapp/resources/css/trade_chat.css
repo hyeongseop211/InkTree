@@ -1,0 +1,581 @@
+
+:root {
+    --primary: #2563eb;
+    --primary-dark: #1d4ed8;
+    --primary-light: #dbeafe;
+    --secondary: #475569;
+    --success: #10b981;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --info: #0ea5e9;
+    --light: #f8fafc;
+    --dark: #1e293b;
+    --gray-100: #f1f5f9;
+    --gray-200: #e2e8f0;
+    --gray-300: #cbd5e1;
+    --gray-400: #94a3b8;
+    --gray-500: #64748b;
+    
+    --border-radius-sm: 0.25rem;
+    --border-radius: 0.5rem;
+    --border-radius-lg: 0.75rem;
+    --border-radius-xl: 1rem;
+    
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    
+    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+    
+    --font-sans: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-sans);
+    background-color: var(--gray-100);
+    color: var(--dark);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    display: flex;
+    justify-content: center;
+}
+
+/* Chat Container */
+.chat-container {
+    width: 100%;
+    max-width: 800px;
+    background-color: white;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 180px);
+    min-height: 600px;
+    position: relative;
+}
+
+/* Chat Header */
+.chat-header {
+    display: flex;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    background-color: var(--primary);
+    color: white;
+    position: relative;
+    z-index: 10;
+    box-shadow: var(--shadow-sm);
+}
+
+.back-list {
+    display: flex;
+    align-items: center;
+    color: var(--primary);
+    text-decoration: none;
+/*    margin-right: 1rem;*/
+    font-weight: 500;
+    transition: var(--transition-fast);
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--border-radius);
+
+	background-color: #fff;
+}
+
+.back-list:hover {
+	color: #fff;
+	background-color: #92c8ff;
+}
+
+
+.back-link {
+    display: flex;
+    align-items: center;
+    color: white;
+    text-decoration: none;
+/*    margin-right: 1rem;*/
+    font-weight: 500;
+    transition: var(--transition-fast);
+    padding: 0.5rem 0.75rem;
+/*    border-radius: var(--border-radius);*/
+	background-color: rgba(255, 255, 255, 0.15);
+}
+
+
+.back-link:hover {
+/*    background-color: rgb(176, 225, 249);*/
+    background-color: rgba(0, 98, 151, 0.167);
+/*    background-color: var(--info);*/
+}
+
+.back-link:active {
+    background-color: rgba(255, 255, 255, 0.25);
+}
+
+.back-link i {
+    margin-right: 0.5rem;
+}
+
+.chat-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    flex-grow: 1;
+    text-align: right;
+}
+
+/* Post Info Bar */
+/*.post-info-bar {*/
+/*    display: flex;*/
+/*    align-items: center;*/
+/*    padding: 1rem;*/
+/*    background-color: white;*/
+/*    border-bottom: 1px solid var(--gray-200);*/
+/*    transition: var(--transition-fast);*/
+/*}*/
+
+/*.post-info-bar:hover {*/
+/*    background-color: var(--gray-300);*/
+/*}*/
+
+/*.post-info-bar a {*/
+/*    display: flex;*/
+/*    width: 100%;*/
+/*    text-decoration: none;*/
+/*    color: inherit;*/
+/*}*/
+
+.post-thumbnail {
+    width: 60px;
+    height: 60px;
+    border-radius: var(--border-radius);
+    background-color: var(--gray-200);
+    margin-right: 1rem;
+    overflow: hidden;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-sm);
+}
+
+.post-thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.post-details {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+
+.post-title {
+    font-weight: 600;
+    font-size: 1.4rem;
+    color: var(--dark);
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.price-status-row {
+    display: flex;
+    align-items: center;
+/*    gap: 0.75rem;*/
+}
+.post-price {
+    font-weight: 700;
+    font-size: 1.3rem;
+    color: var(--primary);
+/*    margin-bottom: 0.25rem;*/
+/*	margin-left: 15px;*/
+}
+
+.post-status {
+/*    display: inline-block;*/
+    padding: 0.25rem 0.5rem;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-align: center;
+    width: fit-content;
+	margin-left: 15px;
+}
+
+.post-status.available {
+    background-color: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+}
+
+.post-status.reserved {
+	background-color: #fef5e7;
+	color: #e67e22;
+}
+
+.post-status.sold {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: var(--danger);
+}
+
+/* Chat Messages */
+.chat-messages {
+    flex-grow: 1;
+    padding: 1.5rem;
+    overflow-y: auto;
+    background-color: var(--gray-100);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    scroll-behavior: smooth;
+}
+
+.message {
+    max-width: 75%;
+    padding: 0.75rem 1rem;
+    border-radius: var(--border-radius-lg);
+    position: relative;
+    animation: fadeIn 0.3s ease;
+    word-break: break-word;
+    box-shadow: var(--shadow-sm);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.message.my-message {
+    align-self: flex-end;
+    background-color: var(--primary);
+    color: white;
+    border-bottom-right-radius: var(--border-radius-sm);
+}
+
+.message.other-message {
+    align-self: flex-start;
+    background-color: white;
+    color: var(--dark);
+    border-bottom-left-radius: var(--border-radius-sm);
+}
+
+.message-content {
+    line-height: 1.5;
+    white-space: pre-wrap;
+}
+
+.message-time {
+    font-size: 0.7rem;
+    opacity: 0.8;
+    margin-top: 0.25rem;
+    text-align: right;
+}
+
+.my-message .message-time {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.other-message .message-time {
+    color: var(--gray-500);
+}
+
+/* Chat Input */
+.chat-input-container {
+    display: flex;
+    align-items: flex-end; /* Align items to bottom for proper textarea alignment */
+    padding: 1rem;
+    background-color: white;
+    border-top: 1px solid var(--gray-200);
+    position: relative;
+    z-index: 5;
+}
+
+.chat-input {
+    flex-grow: 1;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--border-radius-xl);
+    padding: 0.75rem 1.25rem;
+    resize: none;
+    max-height: 150px; /* Maximum height */
+    min-height: 45px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    outline: none;
+    transition: var(--transition-fast);
+    overflow-y: auto; /* Enable scrolling for long content */
+    line-height: 1.5;
+    color: var(--dark);
+}
+
+.chat-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+/* Auto-resize textarea */
+.chat-input {
+    overflow: hidden; /* Hide scrollbar during auto-resize */
+}
+
+.send-button {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    margin-left: 0.75rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition-fast);
+    flex-shrink: 0;
+    box-shadow: var(--shadow-sm);
+}
+
+.send-button:hover {
+    background-color: var(--primary-dark);
+    transform: scale(1.05);
+}
+
+.send-button:active {
+    transform: scale(0.95);
+}
+
+.send-button:disabled {
+    background-color: var(--gray-400);
+    cursor: not-allowed;
+    transform: none;
+}
+
+.send-button i {
+    font-size: 1.1rem;
+}
+
+/* Empty State */
+.empty-chat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--gray-500);
+    text-align: center;
+    padding: 2rem;
+}
+
+.empty-chat i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: var(--gray-400);
+}
+
+.empty-chat h3 {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+    color: var(--gray-600);
+}
+
+.empty-chat p {
+    font-size: 0.9rem;
+    max-width: 300px;
+    color: var(--gray-500);
+}
+
+/* System Message */
+.system-message {
+    align-self: center;
+    background-color: var(--gray-200);
+    color: var(--gray-600);
+    font-size: 0.85rem;
+    padding: 0.5rem 1rem;
+    border-radius: var(--border-radius-xl);
+    max-width: 90%;
+    text-align: center;
+}
+
+/* Typing Indicator */
+.typing-indicator {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    background-color: white;
+    border-radius: var(--border-radius-lg);
+    width: fit-content;
+    margin-top: 0.5rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.typing-indicator span {
+    height: 8px;
+    width: 8px;
+    background-color: var(--gray-400);
+    border-radius: 50%;
+    display: inline-block;
+    margin: 0 1px;
+    animation: typing 1.4s infinite ease-in-out both;
+}
+
+.typing-indicator span:nth-child(1) {
+    animation-delay: 0s;
+}
+
+.typing-indicator span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.typing-indicator span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes typing {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.5); }
+    100% { transform: scale(1); }
+}
+
+/* Scrollbar Styling */
+.chat-messages::-webkit-scrollbar {
+    width: 6px;
+}
+
+.chat-messages::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.chat-messages::-webkit-scrollbar-thumb {
+    background-color: var(--gray-300);
+    border-radius: 20px;
+}
+
+.chat-messages::-webkit-scrollbar-thumb:hover {
+    background-color: var(--gray-400);
+}
+
+.chat-input::-webkit-scrollbar {
+    width: 6px;
+}
+
+.chat-input::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.chat-input::-webkit-scrollbar-thumb {
+    background-color: var(--gray-300);
+    border-radius: 20px;
+}
+
+.chat-input::-webkit-scrollbar-thumb:hover {
+    background-color: var(--gray-400);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        margin: 0;
+        padding: 0;
+    }
+    
+    .chat-container {
+        height: 100vh;
+        max-width: 100%;
+        border-radius: 0;
+    }
+    
+    .message {
+        max-width: 85%;
+    }
+    
+    .chat-input-container {
+        padding: 0.75rem;
+    }
+    
+    .chat-input {
+        padding: 0.6rem 1rem;
+    }
+    
+    .send-button {
+        width: 40px;
+        height: 40px;
+    }
+}
+
+/* Auto-resize script for textarea */
+@media screen {
+    /* This will be added via JavaScript */
+    .auto-resize-active {
+        overflow: hidden;
+    }
+}
+/* 날짜 구분선 스타일 */
+.date-divider {
+    text-align: center;
+    margin: 1rem 0;
+    position: relative;
+    color: var(--gray-500);
+    font-size: 0.8rem;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.date-divider::before,
+.date-divider::after {
+    content: "";
+    flex-grow: 1;
+    height: 1px;
+    background-color: var(--gray-300);
+    margin: 0 10px;
+}
+
+/* 메시지 그룹 간격 조정 */
+.message + .message {
+    margin-top: 0.5rem;
+}
+
+/* 날짜가 바뀌는 첫 메시지는 위 여백 추가 */
+.date-divider + .message {
+    margin-top: 1rem;
+}
+/* Add this script to your JSP file to enable auto-resizing of the textarea */
+/* 
+<script>
+    $(document).ready(function() {
+        // Auto-resize textarea as user types
+        function autoResizeTextarea() {
+            const textarea = document.getElementById('messageInput');
+            if (!textarea) return;
+            
+            textarea.style.height = 'auto';
+            const newHeight = Math.min(textarea.scrollHeight, 150); // Max height: 150px
+            textarea.style.height = newHeight + 'px';
+        }
+        
+        // Initialize and add event listeners
+        $('#messageInput').on('input', autoResizeTextarea);
+        
+        // Initial resize
+        autoResizeTextarea();
+    });
+</script>
+*/

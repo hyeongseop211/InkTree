@@ -1,0 +1,8 @@
+CREATE OR REPLACE TRIGGER activity_log_bi
+BEFORE INSERT ON ACTIVITY_LOG
+FOR EACH ROW
+BEGIN
+    SELECT activity_log_seq.NEXTVAL
+    INTO :new.log_id
+    FROM dual;
+END;

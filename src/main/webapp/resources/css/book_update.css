@@ -1,0 +1,291 @@
+* {
+    box-sizing: border-box;
+    font-family: 'Noto Sans KR', sans-serif;
+}
+
+/* 바디 */
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #f5f5f5;
+    color: #333;
+}
+
+/* 폼 */
+#updateForm {
+    max-width: 700px;
+    margin: 30px auto 60px;
+    padding: 30px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+/* 제목 */
+h2 {
+    text-align: center;
+    color: #1e3a8a;
+    margin-bottom: 30px;
+    font-size: 40px;
+}
+
+/* 1행: 도서번호, ISBN - 첫 번째와 두 번째 div를 가로로 배치 */
+#updateForm > div:nth-of-type(1){
+    display: inline-block;
+    width: 15%;
+    vertical-align: top;
+
+}
+#updateForm > div:nth-of-type(2) {
+    display: inline-block;
+    width: 81%;
+    vertical-align: top;
+}
+
+#updateForm > div:nth-of-type(1) {
+    margin-right: 3%;
+}
+
+/* 2행: 도서제목 - 세 번째 div */
+#updateForm > div:nth-of-type(3) {
+    width: 100%;
+    margin-bottom: 10px;
+    clear: both;
+}
+
+/* 3행: 도서 설명 - 네 번째 div */
+/* #updateForm > div:nth-of-type(4) { */
+/*     width: 100%; */
+/*     margin-bottom: 10px; */
+/* } */
+
+/* input[name="bookComent"] { */
+/*   height: 170px; 높이를 더 크게 설정 */
+/*   padding-top: 5px; */
+/*   padding-bottom: 5px; */
+/*   width: 100%; */
+/*   vertical-align: top; */
+/*   text-align: left; */
+/*   line-height: 300px; */
+/* } */
+
+
+/* .input-container{ */
+/* 	position: relative; */
+/* 	width: 100%; */
+/* } */
+/* .floating-label{ */
+/* 	position: absolute; */
+/* 	top: 10px; */
+/* 	left: 10px; */
+/* 	pointer-events: none; */
+/* 	color: #757575; */
+/* 	font-size: 16px; */
+/* } */
+/* input[name="bookComent"]:focus + .floating-label, */
+/* input[name="bookComent"]:not(:placeholder-shown) + .floating-label { */
+/*     top: 5px; */
+/*     font-size: 16px; */
+/*     color: #757575; */
+/* } */
+/* #updateForm > div:nth-of-type(4) { */
+/*     width: 100%; */
+/*     margin-bottom: 10px; */
+/* } */
+
+/* textarea test */
+textarea[name="bookComent"] {
+  height: 170px; /* 높이를 더 크게 설정 */
+  padding-top: 5px;
+  padding-bottom: 5px;
+  padding-left: 8px;
+  width: 100%;
+  vertical-align: top;
+  text-align: left;
+  resize: none; /* 크기 조절 비활성화 */
+  font-family: inherit; /* 폰트 상속 */
+  font-size: inherit; /* 폰트 크기 상속 */
+  border: 1px solid #ccc; /* input과 동일한 테두리 */
+  border-radius: 4px; /* input과 동일한 테두리 둥글기 */
+  outline: none; /* 포커스 시 기본 아웃라인 제거 */
+}
+
+textarea[name="bookComent"]:focus {
+  border-color: #2563eb; /* input 포커스와 동일한 테두리 색상 */
+}
+
+.input-container {
+  position: relative;
+  width: 100%;
+}
+
+/* placeholder 스타일링 */
+textarea[name="bookComent"]::placeholder {
+  color: #757575;
+  font-size: 16px;
+  padding-left: 2px;
+}
+
+/* 포커스 시 placeholder 스타일 변경 */
+textarea[name="bookComent"]:focus::placeholder {
+  color: transparent;
+}
+/*=====================*/
+/* 4행: 저자, 출판사 - 다섯 번째와 여섯 번째 div */
+#updateForm > div:nth-of-type(5),
+#updateForm > div:nth-of-type(6) {
+    display: inline-block;
+    width: 48%;
+    vertical-align: top;
+}
+
+#updateForm > div:nth-of-type(5) {
+    margin-right: 3%;
+}
+
+/* 5행: 발행일 - 일곱 번째 div */
+#updateForm > div:nth-of-type(7) {
+    width: 100%;
+    margin-bottom: 10px;
+    clear: both;
+}
+
+/* 6행: 카테고리들 - 여덟 번째와 아홉 번째 div */
+#updateForm > div:nth-of-type(8),
+#updateForm > div:nth-of-type(9) {
+    display: inline-block;
+    width: 48%;
+    vertical-align: top;
+}
+
+#updateForm > div:nth-of-type(8) {
+    margin-right: 3%;
+}
+
+/* 7행: 재고, 대출횟수 - 열 번째와 열한 번째 div */
+#updateForm > div:nth-of-type(10),
+#updateForm > div:nth-of-type(11) {
+    display: inline-block;
+    width: 48%;
+    vertical-align: top;
+}
+
+#updateForm > div:nth-of-type(10) {
+    margin-right: 3%;
+}
+
+/* 8행: 버튼들 - 마지막 div */
+#updateForm > div:last-child {
+    text-align: center;
+    margin-top: 30px;
+    clear: both;
+}
+
+/* 텍스트 */
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #444;
+}
+
+/* 텍스트 박스 */
+input[type="text"],
+input[type="number"],
+input[type="date"],
+select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+/* 텍스트박스 눌렀을때 */
+input:focus,
+textarea:focus,
+select:focus {
+    border-color: #64748b;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(100, 116, 139, 0.2);
+}
+
+input[readonly] {
+    background-color: #f0f0f0;
+    cursor: not-allowed;
+}
+
+/* /* 별 */ */
+/* .required-mark { */
+/*     color: #e11d48; */
+/*     margin-left: 4px; */
+/* } */
+
+/* 텍스트 박스 내 힌트 */
+.input-hint {
+    font-size: 12px;
+    color: #6b7280;
+    margin-top: 5px;
+    display: block;
+}
+
+/* 올바르지 않을시 빨간 경고문 */
+.error-message {
+    color: #e11d48;
+    font-size: 12px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    display: none;
+}
+
+/* input:invalid ~ .error-message { */
+/*     display: block; */
+/* } */
+/* input.touched:invalid ~ .error-message { */
+/*     display: block; */
+/* } */
+/* input.touched:required ~ .error-message { */
+/*     display: block; */
+/* } */
+
+input:invalid + .error-message {
+    display: block;
+}
+
+/* 버튼 스타일 */
+button {
+    padding: 12px 25px;
+    margin: 0 5px;
+    background-color: #1e3a8a;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #1d4ed8;
+}
+
+/* 리셋 버튼 */
+button[type="reset"] {
+    background-color: #e5e7eb;
+    color: #4b5563;
+}
+
+button[type="reset"]:hover {
+    background-color: #d1d5db;
+}
+
+/* 삭제 버튼 */
+button.btn-delete {
+    background-color: #ef4444;
+}
+
+button.btn-delete:hover {
+    background-color: #dc2626;
+}

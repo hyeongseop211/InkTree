@@ -1,0 +1,177 @@
+* {
+  box-sizing: border-box;
+  font-family: 'Noto Sans KR', sans-serif;
+}
+/* 바디 */
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #f5f5f5;
+  color: #333;
+}
+/* 폼 */
+#updateForm {
+  max-width: 700px;
+  margin: 30px auto 60px;
+  padding: 30px;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+/* 제목 */
+h2 {
+  text-align: center;
+  color: #1e3a8a;
+  margin-bottom: 30px;
+  font-size: 28px;
+}
+
+/* 1행: 아이디와 이름 */
+#updateForm > div:nth-child(3),
+#updateForm > div:nth-child(4) {
+  display: inline-block;
+  width: 48%;
+  margin-bottom: 20px;
+}
+
+#updateForm > div:nth-child(3) {
+  margin-right: 3%;
+}
+
+/* 2행: 이메일 */
+.form-group:nth-of-type(1) {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+/* 3행: 전화번호 */
+.form-group:nth-of-type(2) {
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+/* 4행: 주소 */
+.form-group.full-width {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+/* 6행: 비밀번호 필드 */
+#updateForm > div:nth-child(9) {
+  margin-top: 20px;
+  margin-bottom: 30px;
+  width: 100%;
+}
+/* 텍스트  */
+label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #444;
+}
+/* 텍스트 박스 */
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="password"] {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 16px;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+/* 텍스트박스 눌렀을때 */
+input:focus {
+  border-color: #64748b;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(100, 116, 139, 0.2);
+}
+
+input[readonly] {
+  background-color: #f0f0f0;
+  cursor: not-allowed;
+}
+/* 별  */
+.required-mark {
+  color: #e11d48;
+  margin-left: 4px;
+}
+/* 텍스트 박스 내 힌트 */
+.input-hint {
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 5px;
+  display: block;
+}
+/* 올바르지 않을시 빨간 경고문 */
+.error-message {
+  color: #e11d48;
+  font-size: 12px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  display: none;
+}
+
+input:invalid ~ .error-message {
+  display: block;
+}
+
+/* 주소 검색 */
+.address-search {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.address-search input {
+  flex: 1;
+}
+
+/* 주소 검색 버튼 */
+.address-search button {
+  padding: 0 15px;
+  background-color: #64748b;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.address-search button:hover {
+  background-color: #1d4ed8;
+}
+
+/* 버튼 스타일 */
+#updateForm > div:last-child {
+  text-align: center;
+  margin-top: 30px;
+}
+
+button {
+  padding: 12px 25px;
+  margin: 0 5px;
+  background-color: #1e3a8a;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #1d4ed8;
+}
+/* 리셋 버튼 */
+button[type="reset"] {
+  background-color: #e5e7eb;
+  color: #4b5563;
+}
+
+button[type="reset"]:hover {
+  background-color: #d1d5db;
+}

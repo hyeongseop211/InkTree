@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.boot.z_util.otherMVC.dao.UtilDAO">
+
+	<!-- 전체 도서 수 -->
+	<select id="getTotalBooks" resultType="int">
+		SELECT COUNT(*) FROM
+		bookinfo
+	</select>
+
+	<!-- 전체 회원 수 -->
+	<select id="getTotalUsers" resultType="int">
+		SELECT COUNT(*) FROM
+		userinfo
+	</select>
+
+	<!-- 대출 중인 도서 수 -->
+	<select id="getBorrowedBooks" resultType="int">
+		SELECT COUNT(*) FROM
+		book_borrow
+	</select>
+
+	<!-- 연체 도서 수 (대출일로부터 30일 초과) -->
+	<select id="getOverdueBooks" resultType="int">
+		SELECT COUNT(*)
+		FROM
+		book_borrow
+		WHERE (SYSDATE - bookBorrowDate) > 30
+	</select>
+
+	<!-- 유저의 연체된 도서 수 -->
+	<select id="getUserOver" resultType="int">
+		SELECT COUNT(*)
+		FROM
+		book_borrow
+		WHERE (SYSDATE - bookBorrowDate) > 30 and
+		userNumber=#{userNumber}
+	</select>
+
+	<!-- 유저가 빌리고 있는 도서 수 -->
+	<select id="getUserBorrowed" resultType="int">
+		select count(*)
+		from
+		book_borrow
+		where userNUmber = #{userNumber}
+	</select>
+
+	<!-- 유저 도서대출 수 ***(대출하는 순간 올라감)*** -->
+	<select id="getUserRecord" resultType="int">
+		select userBorrow
+		from
+		userinfo
+		where userNumber = #{userNumber}
+	</select>
+
+	<!-- 기록테이블의 유저 책 수 ***(반납하는 순간 올라감)*** -->
+	<select id="getBookRecordCount" resultType="int">
+		select count(*) from
+		book_record
+		where userNumber=#{userNumber}
+	</select>
+
+	<delete id="clearAllSessions">
+		DELETE FROM user_sessions
+	</delete>
+</mapper>

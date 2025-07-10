@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.boot.chat.dao.ChatMessageDAO">
+
+    <!-- 메시지 저장 - RECEIVERNUMBER 컬럼 추가 -->
+<insert id="insertChatMessage" parameterType="com.boot.chat.dto.ChatMessageResponse" useGeneratedKeys="true" keyProperty="messageId">
+    <selectKey keyProperty="messageId" resultType="Long" order="BEFORE">
+        SELECT TRADE_CHATMESSAGE_SEQ.NEXTVAL FROM DUAL
+    </selectKey>
+    INSERT INTO TRADE_CHATMESSAGE (
+        MESSAGEID,
+        ROOMID, 
+        SENDERNUMBER, 
+        MESSAGE, 
+        READSTATUS, 
+        CREATEDAT,
+        RECEIVERNUMBER
+    ) VALUES (
+        #{messageId},
+        #{roomId}, 
+        #{senderNumber}, 
+        #{message}, 
+        #{readStatus}, 
+        #{createdAt},
+        #{receiverNumber}
+    )
+</insert>
+    <!-- 모든 메시지 읽음 처리 -->
+<update id="markAllMessagesAsRead">
+    UPDATE 
+        TRADE_CHATMESSAGE
+    SET 
+        READSTATUS = 'READ'
+    WHERE 
+        ROOMID = #{roomId}
+        AND RECEIVERNUMBER = #{userNumber}
+        AND READSTATUS = 'UNREAD'
+</update>
+
+    <!-- 채팅방의 모든 메시지 조회 - RECEIVERNUMBER 추가 -->
+<select id="selectChatMessagesByRoomId" parameterType="Long" resultType="com.boot.chat.dto.ChatMessageResponse">
+    SELECT 
+        MESSAGEID as messageId,
+        ROOMID as roomId,
+        SENDERNUMBER as senderNumber,
+        RECEIVERNUMBER as receiverNumber,
+        MESSAGE as message,
+        READSTATUS as readStatus,
+        CREATEDAT as createdAt
+    FROM 
+        TRADE_CHATMESSAGE
+    WHERE 
+        ROOMID = #{roomId}
+    ORDER BY 
+        CREATEDAT ASC
+</select>
+    
+    <!-- 메시지 읽음 상태 업데이트 -->
+    <update id="updateReadStatus">
+        UPDATE 
+            TRADE_CHATMESSAGE
+        SET 
+            READSTATUS = 'READ'
+        WHERE 
+            ROOMID = #{roomId}
+            AND RECEIVERNUMBER = #{userNumber}
+            AND READSTATUS = 'UNREAD'
+    </update>
+    
+<!-- 사용자의 읽지 않은 메시지 수 조회 - RECEIVERNUMBER 사용 -->
+<select id="countUnreadMessages" resultType="int">
+    SELECT 
+        COUNT(*)
+    FROM 
+        TRADE_CHATMESSAGE M
+    WHERE 
+        M.RECEIVERNUMBER = #{userNumber}
+        AND M.READSTATUS = 'UNREAD'
+</select>
+
+<!-- 특정 채팅방의 마지막 메시지 조회 - RECEIVERNUMBER 추가 -->
+<select id="selectLastMessageByRoomId" parameterType="Long" resultType="com.boot.chat.dto.ChatMessageResponse">
+    SELECT * FROM (
+        SELECT 
+            m.MESSAGEID as messageId,
+            m.ROOMID as roomId,
+            m.SENDERNUMBER as senderNumber,
+            m.RECEIVERNUMBER as receiverNumber,
+            u.USERNAME as senderName,
+            m.MESSAGE as message,
+            m.READSTATUS as readStatus,
+            m.CREATEDAT as createdAt
+        FROM 
+            TRADE_CHATMESSAGE m
+        LEFT JOIN 
+            USERINFO u ON m.SENDERNUMBER = u.USERNUMBER
+        WHERE 
+            m.ROOMID = #{roomId}
+        ORDER BY 
+            m.CREATEDAT DESC
+    ) WHERE ROWNUM = 1
+</select>
+    
+    <!-- 메시지 삭제 -->
+    <delete id="deleteChatMessage" parameterType="Long">
+        DELETE FROM 
+            TRADE_CHATMESSAGE
+        WHERE 
+            MESSAGEID = #{messageId}
+    </delete>
+    
+    <!-- 채팅방의 모든 메시지 삭제 -->
+    <delete id="deleteChatMessagesByRoomId" parameterType="Long">
+        DELETE FROM 
+            TRADE_CHATMESSAGE
+        WHERE 
+            ROOMID = #{roomId}
+    </delete>
+    
+<!-- 사용자의 모든 채팅방에서 읽지 않은 메시지 총 개수 조회 - RECEIVERNUMBER 사용 -->
+<select id="countTotalUnreadMessagesByUser" parameterType="Long" resultType="int">
+    SELECT 
+        COUNT(*)
+    FROM 
+        TRADE_CHATMESSAGE m
+    WHERE 
+        m.RECEIVERNUMBER = #{userNumber}
+        AND m.READSTATUS = 'UNREAD'
+</select>
+
+<!-- 활성 채팅방을 제외한 읽지 않은 메시지 수 조회 - RECEIVERNUMBER 사용 -->
+<select id="countUnreadMessagesExcludeActiveRoom" resultType="int">
+    SELECT 
+        COUNT(*)
+    FROM 
+        TRADE_CHATMESSAGE m
+    WHERE 
+        m.RECEIVERNUMBER = #{userNumber}
+        AND m.READSTATUS = 'UNREAD'
+        AND m.ROOMID != #{activeRoomId}
+</select>
+
+</mapper>

@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.boot.chat.dao.ChatRoomDAO">
+
+    <!-- 채팅방 생성 -->
+<insert id="insertChatRoom" parameterType="com.boot.chat.dto.ChatRoomResponse" useGeneratedKeys="true" keyProperty="roomId">
+    <selectKey keyProperty="roomId" resultType="Long" order="BEFORE">
+        SELECT TRADE_CHATROOM_SEQ.NEXTVAL FROM DUAL
+    </selectKey>
+    INSERT INTO TRADE_CHATROOM (
+        ROOMID,
+        POSTID, 
+        SELLERNUMBER, 
+        BUYERNUMBER, 
+        CREATEDAT, 
+        LASTMESSAGEAT, 
+        STATUS
+    ) VALUES (
+        #{roomId},
+        #{postId}, 
+        #{sellerNumber}, 
+        #{buyerNumber}, 
+        #{createdAt}, 
+        #{lastMessageAt}, 
+        #{status}
+    )
+</insert>
+    
+    <!-- 채팅방 조회 -->
+    <select id="selectChatRoomById" parameterType="Long" resultType="com.boot.chat.dto.ChatRoomResponse">
+        SELECT 
+            ROOMID as roomId,
+            POSTID as postId,
+            SELLERNUMBER as sellerNumber,
+            BUYERNUMBER as buyerNumber,
+            CREATEDAT as createdAt,
+            LASTMESSAGEAT as lastMessageAt,
+            STATUS as status
+        FROM 
+            TRADE_CHATROOM
+        WHERE 
+            ROOMID = #{roomId}
+    </select>
+    
+    <!-- 특정 사용자의 모든 채팅방 조회 -->
+    <select id="selectChatRoomsByUser" parameterType="Long" resultType="com.boot.chat.dto.ChatRoomResponse">
+        SELECT 
+            ROOMID as roomId,
+            POSTID as postId,
+            SELLERNUMBER as sellerNumber,
+            BUYERNUMBER as buyerNumber,
+            CREATEDAT as createdAt,
+            LASTMESSAGEAT as lastMessageAt,
+            STATUS as status
+        FROM 
+            TRADE_CHATROOM
+        WHERE 
+            SELLERNUMBER = #{userNumber} OR BUYERNUMBER = #{userNumber}
+        ORDER BY 
+            LASTMESSAGEAT DESC
+    </select>
+    
+    <!-- 특정 게시글과 사용자 간의 채팅방 조회 -->
+    <select id="selectChatRoomByPostAndUsers" resultType="com.boot.chat.dto.ChatRoomResponse">
+        SELECT 
+            ROOMID as roomId,
+            POSTID as postId,
+            SELLERNUMBER as sellerNumber,
+            BUYERNUMBER as buyerNumber,
+            CREATEDAT as createdAt,
+            LASTMESSAGEAT as lastMessageAt,
+            STATUS as status
+        FROM 
+            TRADE_CHATROOM
+        WHERE 
+            POSTID = #{postId}
+            AND SELLERNUMBER = #{sellerNumber}
+            AND BUYERNUMBER = #{buyerNumber}
+    </select>
+    
+    <!-- 채팅방 마지막 메시지 시간 업데이트 -->
+    <update id="updateLastMessageAt">
+        UPDATE 
+            TRADE_CHATROOM
+        SET 
+            LASTMESSAGEAT = #{lastMessageAt}
+        WHERE 
+            ROOMID = #{roomId}
+    </update>
+    
+    <!-- 채팅방 상태 업데이트 -->
+    <update id="updateChatRoomStatus">
+        UPDATE 
+            TRADE_CHATROOM
+        SET 
+            STATUS = #{status}
+        WHERE 
+            ROOMID = #{roomId}
+    </update>
+    
+    <!-- 채팅방 삭제 -->
+    <delete id="deleteChatRoom" parameterType="Long">
+        DELETE FROM 
+            TRADE_CHATROOM
+        WHERE 
+            ROOMID = #{roomId}
+    </delete>
+<!-- 채팅방 목록 조회 (별칭 사용 및 타입 명시) -->
+<select id="selectChatRoomsWithDetails" parameterType="Long" resultType="java.util.HashMap">
+    SELECT 
+        CR.ROOMID as "roomId",
+        CR.POSTID as "postId",
+        TP.TITLE as "postTitle",
+        TP.PRICE as "postPrice",
+        TP.STATUS as "postStatus",
+        CR.SELLERNUMBER as "sellerNumber",
+        SELLER.USERNAME as "sellerName",
+        CR.BUYERNUMBER as "buyerNumber",
+        BUYER.USERNAME as "buyerName",
+        CR.CREATEDAT as "createdAt",
+        CR.LASTMESSAGEAT as "lastMessageAt",
+        CR.STATUS as "status",
+        (SELECT TO_CHAR(CM.MESSAGE) 
+         FROM TRADE_CHATMESSAGE CM 
+         WHERE CM.ROOMID = CR.ROOMID 
+         AND CM.CREATEDAT = (
+             SELECT MAX(CM2.CREATEDAT) 
+             FROM TRADE_CHATMESSAGE CM2 
+             WHERE CM2.ROOMID = CR.ROOMID
+         )) as "lastMessage",
+        (SELECT COUNT(*) 
+         FROM TRADE_CHATMESSAGE CM 
+         WHERE CM.ROOMID = CR.ROOMID 
+         AND CM.RECEIVERNUMBER = #{userNumber} 
+         AND CM.READSTATUS = 'UNREAD') as "unreadCount"
+    FROM 
+        TRADE_CHATROOM CR
+    JOIN 
+        TRADE_POST TP ON CR.POSTID = TP.POSTID
+    JOIN 
+        USERINFO SELLER ON CR.SELLERNUMBER = SELLER.USERNUMBER
+    JOIN 
+        USERINFO BUYER ON CR.BUYERNUMBER = BUYER.USERNUMBER
+    WHERE 
+        CR.SELLERNUMBER = #{userNumber} OR CR.BUYERNUMBER = #{userNumber}
+    ORDER BY 
+        CR.LASTMESSAGEAT DESC NULLS LAST
+</select>
+    
+    <!-- 사용자 정보 조회 -->
+    <select id="selectUserInfo" parameterType="Long" resultType="java.util.HashMap">
+        SELECT 
+            USERNUMBER as userNumber,
+            USERNAME as userName,
+            USERID as userId,
+            USERTEL as userTel,
+            USEREMAIL as userEmail
+        FROM 
+            USERINFO
+        WHERE 
+            USERNUMBER = #{userNumber}
+    </select>
+</mapper>

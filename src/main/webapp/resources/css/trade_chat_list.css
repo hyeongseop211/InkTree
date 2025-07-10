@@ -1,0 +1,387 @@
+:root {
+  --primary: #2563eb;
+  --primary-dark: #1d4ed8;
+  --primary-light: #dbeafe;
+  --secondary: #475569;
+  --success: #10b981;
+  --danger: #ef4444;
+  --warning: #f59e0b;
+  --info: #0ea5e9;
+  --light: #f8fafc;
+  --dark: #1e293b;
+  --gray-100: #f1f5f9;
+  --gray-200: #e2e8f0;
+  --gray-300: #cbd5e1;
+  --gray-400: #94a3b8;
+  --gray-500: #64748b;
+
+  --border-radius-sm: 0.25rem;
+  --border-radius: 0.5rem;
+  --border-radius-lg: 0.75rem;
+  --border-radius-xl: 1rem;
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  --font-sans: "Noto Sans KR", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Base Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--gray-100);
+  color: var(--dark);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+/* Chat List Container */
+.chat-list-container {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  background-color: white;
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}
+
+/* Page Title */
+.page-title {
+  padding: 1.5rem;
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--dark);
+  border-bottom: 1px solid var(--gray-200);
+  background-color: white;
+  position: relative;
+}
+
+.page-title::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  left: 1.5rem;
+  width: 50px;
+  height: 3px;
+  background-color: var(--primary);
+  border-radius: 3px 3px 0 0;
+}
+
+/* No Chats Message */
+.no-chats {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  text-align: center;
+  color: var(--gray-500);
+}
+
+.no-chats i {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  color: var(--gray-400);
+}
+
+.no-chats p {
+  font-size: 1.1rem;
+  max-width: 300px;
+}
+
+/* Chat Rooms List */
+.chat-rooms {
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-room-item {
+  display: flex;
+  align-items: center;
+  padding: 1.25rem;
+  border-bottom: 1px solid var(--gray-200);
+  text-decoration: none;
+  color: inherit;
+  transition: var(--transition-fast);
+  position: relative;
+}
+
+.chat-room-item:hover {
+  background-color: var(--gray-100);
+}
+
+.chat-room-item:active {
+  background-color: var(--gray-200);
+}
+
+.chat-rooms {
+  display: flex;
+  flex-direction: column;
+  /* gap: 0.75rem; */
+}
+
+.chat-room-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: white;
+  /* border-radius: 0.75rem; */
+  box-shadow: var(--shadow-sm);
+  text-decoration: none;
+  transition: background-color 0.2s ease;
+  /* position: relative; */
+
+  padding: 1rem 1.25rem;
+}
+
+.chat-room-item:hover {
+  background-color: var(--gray-100);
+}
+
+.chat-info {
+  flex: 1;
+  /* display: flex;
+  flex-direction: column;
+  gap: 0.4rem; */
+  min-width: 0;
+}
+
+.chat-badge-wrapper {
+  width: 30px; /* 뱃지 공간 고정 확보 */
+  display: flex;
+  justify-content: flex-end;
+}
+
+.chat-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.chat-user-time {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.chat-user {
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--gray-900);
+}
+
+.chat-time {
+  font-size: 0.75rem;
+  color: var(--gray-400);
+  white-space: nowrap;
+}
+
+.post-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.2rem;
+  align-items: center;
+  
+  color: var(--gray-600);
+}
+
+.post-title {
+  font-weight: 500;
+  width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--secondary);
+  font-size: 1.2rem;
+}
+
+.post-price {
+  font-weight: 700;
+  color: var(--primary);
+  font-size: 1.05rem;
+}
+
+.post-status {
+    width: 70px;
+    height: 25px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.post-status.available {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: var(--success);
+}
+.post-status.reserved {
+  background-color: #fef5e7;
+  color: #e67e22;
+}
+.post-status.sold {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: var(--danger);
+}
+
+.chat-preview {
+    height: 30px;
+  font-size: 0.9rem;
+  color: var(--gray-500);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.unread-badge {
+    margin-top: 40px;
+  background-color: var(--primary);
+  color: white;
+  min-width: 35px;
+  height: 35px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-md);
+  /* margin-left: 1rem; */
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@media (max-width: 768px) {
+  .chat-room-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .chat-user-time {
+    flex-direction: row;
+    width: 100%;
+  }
+
+  .unread-badge {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .container {
+    margin: 0;
+    padding: 0;
+  }
+
+  .chat-list-container {
+    border-radius: 0;
+    max-width: 100%;
+    min-height: 100vh;
+  }
+
+  .page-title {
+    padding: 1.25rem;
+    font-size: 1.3rem;
+  }
+
+  .chat-room-item {
+    padding: 1rem;
+  }
+
+  .post-info {
+    max-width: 100%;
+  }
+
+  .post-title {
+    max-width: 120px;
+  }
+}
+
+/* Animation */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.unread-badge {
+  animation: pulse 2s infinite;
+}
+
+/* Add this to your JSP to make the chat list more interactive */
+/*
+<script>
+    $(document).ready(function() {
+        // Highlight the most recent chat
+        $('.chat-room-item:first-child').addClass('recent-chat');
+        
+        // Format timestamps to be more user-friendly
+        $('.chat-time').each(function() {
+            const timestamp = $(this).text();
+            const date = new Date(timestamp);
+            const now = new Date();
+            
+            // Same day - show only time
+            if (date.toDateString() === now.toDateString()) {
+                const hours = date.getHours().toString().padStart(2, '0');
+                const minutes = date.getMinutes().toString().padStart(2, '0');
+                $(this).text(hours + ':' + minutes);
+            }
+            // Yesterday
+            else if (
+                date.getDate() === now.getDate() - 1 &&
+                date.getMonth() === now.getMonth() &&
+                date.getFullYear() === now.getFullYear()
+            ) {
+                $(this).text('어제');
+            }
+            // Keep the original format for older messages
+        });
+    });
+</script>
+*/

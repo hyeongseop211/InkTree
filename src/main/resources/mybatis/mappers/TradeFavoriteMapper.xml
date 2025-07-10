@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="com.boot.trade.dao.TradeFavoriteDAO">
+    <!-- 관심목록 추가 -->
+    <insert id="addFavorite">
+        INSERT INTO TRADE_FAVORITE (userNumber, POSTID, CREATEDAT)
+        VALUES (#{userNumber}, #{postId}, NOW())
+    </insert>
+    
+    <!-- 관심목록 삭제 -->
+    <delete id="removeFavorite">
+        DELETE FROM TRADE_FAVORITE
+        WHERE userNumber = #{userNumber} AND POSTID = #{postId}
+    </delete>
+    
+    <!-- 관심목록 체크 -->
+    <select id="checkFavorite" resultType="int">
+        SELECT COUNT(*)
+        FROM TRADE_FAVORITE
+        WHERE userNumber = #{userNumber} AND POSTID = #{postId}
+    </select>
+    
+<!-- SQL 조건절 공통 부분 -->
+<sql id="criteriaDTO">
+    <where>
+        <!-- 카테고리 필터링 조건 -->
+        <if test="bookMajorCategory != null and bookMajorCategory != ''">
+            AND tp.bookMajorCategory = #{bookMajorCategory}
+        </if>
+        <if test="bookSubCategory != null and bookSubCategory != ''">
+            AND tp.bookSubCategory = #{bookSubCategory}
+        </if>
+        
+        <!-- 상태 필터링 조건 -->
+        <if test="status != null and status != '' and status != 'all'">
+            <choose>
+                <when test="status == 'available'">
+                    AND tp.status = 'AVAILABLE'
+                </when>
+                <when test="status == 'reserved'">
+                    AND tp.status = 'RESERVED'
+                </when>
+                <when test="status == 'sold'">
+                    AND tp.status = 'SOLD'
+                </when>
+            </choose>
+        </if>
+        
+        <!-- 검색어 조건 - 항상 제목으로만 검색 (Oracle 문법으로 수정) -->
+        <if test="keyword != null and keyword != ''">
+            AND tp.title LIKE '%' || #{keyword} || '%'
+        </if>
+    </where>
+</sql>
+
+<!-- 관심목록 조회 (페이징, 필터링, 정렬 적용) - Oracle 스타일 페이징 -->
+<select id="getFavoriteWithPaging" resultType="com.boot.trade.dto.TradeFavoriteDTO">
+    SELECT * FROM (
+        SELECT a.*, ROWNUM rn FROM (
+            SELECT 
+                tf.favoriteId as favoriteId,
+                tf.userNumber as userNumber,
+                tf.postId as postId,
+                tf.createdAt as createdAt,
+                tp.title,
+                tp.price,
+                tp.status,
+                tp.location,
+                tp.bookMajorCategory as bookMajorCategory,
+                tp.bookSubCategory as bookSubCategory,
+                u.userName as userName,
+                tp.createdAt as postCreatedAt,
+                tp.viewCount as viewCount
+            FROM 
+                TRADE_FAVORITE tf
+            JOIN 
+                TRADE_POST tp ON tf.postId = tp.postId
+            JOIN 
+                USERINFO u ON tp.userNumber = u.userNumber
+            <include refid="criteriaDTO" />
+            
+            <!-- 정렬 조건 -->
+            <choose>
+                <when test="sort != null and sort == 'lowPrice'">
+                    ORDER BY tp.price ASC
+                </when>
+                <when test="sort != null and sort == 'highPrice'">
+                    ORDER BY tp.price DESC
+                </when>
+                <when test="sort != null and sort == 'views'">
+                    ORDER BY tp.viewCount DESC
+                </when>
+                <otherwise>
+                    ORDER BY tf.createdAt DESC
+                </otherwise>
+            </choose>
+        ) a WHERE ROWNUM &lt;= #{pageNum} * #{amount}
+    ) WHERE rn > (#{pageNum} - 1) * #{amount}
+</select>
+    
+    <!-- 관심목록 총 개수 -->
+    <select id="getTotalCount" resultType="int">
+        SELECT
+            COUNT(*)
+        FROM
+            TRADE_FAVORITE tf
+        JOIN
+            TRADE_POST tp ON tf.postId = tp.postId
+        JOIN
+            USERINFO u ON tp.userNumber = u.userNumber
+        <include refid="criteriaDTO" />
+    </select>
+</mapper>

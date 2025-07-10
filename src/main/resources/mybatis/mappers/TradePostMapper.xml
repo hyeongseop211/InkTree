@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.boot.trade.dao.TradePostDAO">
+
+    <sql id="criteriaDTO">
+        <where>
+            tp.status != 'DELETED'
+
+            <if test="bookMajorCategory != null and bookMajorCategory != ''">
+                AND tp.bookMajorCategory = #{bookMajorCategory}
+            </if>
+            <if test="bookSubCategory != null and bookSubCategory != ''">
+                AND tp.bookSubCategory = #{bookSubCategory}
+            </if>
+
+            <if test="status != null and status != '' and status != 'all'">
+                <choose>
+                    <when test="status == 'available'">
+                        AND tp.status = 'AVAILABLE'
+                    </when>
+                    <when test="status == 'reserved'">
+                        AND tp.status = 'RESERVED'
+                    </when>
+                    <when test="status == 'sold'">
+                        AND tp.status = 'SOLD'
+                    </when>
+                </choose>
+            </if>
+
+            <if test="keyword != null and keyword != ''">
+                AND tp.title LIKE '%' || #{keyword} || '%'
+            </if>
+        </where>
+    </sql>
+
+    <!-- 거래 게시글 전체 보기 -->
+    <select id="tradePostView" resultType="com.boot.trade.dto.TradePostDTO">
+        SELECT * FROM (
+            SELECT a.*, ROWNUM rn FROM (
+                SELECT tp.postID, tp.userNumber, u.userName, tp.title, tp.price,
+                       CASE 
+                           WHEN tp.bookMajorCategory IS NOT NULL AND INSTR(tp.bookMajorCategory, '-') > 0 
+                           THEN SUBSTR(tp.bookMajorCategory, INSTR(tp.bookMajorCategory, '-') + 1) 
+                           ELSE tp.bookMajorCategory 
+                       END AS bookMajorCategory,
+                       CASE 
+                           WHEN tp.bookSubCategory IS NOT NULL AND INSTR(tp.bookSubCategory, '-') > 0 
+                           THEN SUBSTR(tp.bookSubCategory, INSTR(tp.bookSubCategory, '-') + 1) 
+                           ELSE tp.bookSubCategory 
+                       END AS bookSubCategory,
+                       tp.status, tp.location, tp.viewCount, tp.createdAt
+                FROM Trade_Post tp
+                JOIN userinfo u ON tp.userNumber = u.userNumber
+                <include refid="criteriaDTO"/>
+                <choose>
+                    <when test="sort != null and sort == 'lowPrice'">
+                        ORDER BY tp.price ASC
+                    </when>
+                    <when test="sort != null and sort == 'highPrice'">
+                        ORDER BY tp.price DESC
+                    </when>
+                    <when test="sort != null and sort == 'views'">
+                        ORDER BY tp.viewCount DESC
+                    </when>
+                    <otherwise>
+                        ORDER BY tp.postID DESC
+                    </otherwise>
+                </choose>
+            ) a WHERE ROWNUM &lt;= #{pageNum} * #{amount}
+        ) WHERE rn &gt; (#{pageNum} - 1) * #{amount}
+    </select>
+
+    <select id="getTotalCount" resultType="int">
+        SELECT COUNT(*) FROM Trade_Post tp
+        JOIN userinfo u ON tp.userNumber = u.userNumber
+        <include refid="criteriaDTO"/>
+    </select>
+
+    <!-- 거래 게시글 작성 -->
+    <insert id="tradePostWrite">
+        insert into Trade_Post(
+            postID, userNumber, title, content, price, 
+            BOOKMAJORCATEGORY, BOOKSUBCATEGORY, status, location
+        )
+        values (
+            seqPostID.NEXTVAL, #{userNumber}, #{title}, #{content}, #{price}, 
+            #{BookMajorCategory, jdbcType=VARCHAR}, #{BookSubCategory, jdbcType=VARCHAR}, 
+            'AVAILABLE', #{location, jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <!-- 거래 게시글 상세 보기 -->
+    <select id="tradePostDetailView" resultType="com.boot.trade.dto.TradePostDTO">
+        SELECT tp.postID, tp.userNumber, u.userName, tp.title, tp.content, tp.price, 
+               tp.bookMajorCategory, tp.bookSubCategory, tp.status, tp.location, tp.viewCount, tp.createdAt, tp.updatedAt,
+               (SELECT COUNT(*) FROM Trade_Favorite WHERE postID = tp.postID) as favoriteCount
+        FROM Trade_Post tp
+        JOIN userinfo u ON tp.userNumber = u.userNumber
+        WHERE tp.postID = #{postID}
+    </select>
+
+    <!-- 거래 게시글 수정 -->
+    <update id="tradePostModify">
+        UPDATE Trade_Post 
+        SET title = #{title},
+            content = #{content},
+            price = #{price},
+            status = #{status},
+            bookMajorCategory = #{bookMajorCategory},
+            bookSubCategory = #{bookSubCategory},
+            location = #{location},
+            updatedAt = CURRENT_TIMESTAMP
+        WHERE postID = #{postID}
+    </update>
+
+    <!-- 거래 게시글 삭제 -->
+    <update id="tradePostDelete">
+        update trade_post
+        set status='DELETED'
+        WHERE postID = #{postID}
+    </update>
+
+    <!-- 조회수 증가 -->
+    <update id="tradePostHit">
+        UPDATE Trade_Post
+        SET viewCount = NVL(viewCount, 0) + 1
+        WHERE postID = #{postID}
+    </update>
+
+    <!-- 찜 중복 확인 -->
+    <select id="tradePostCheckFavorite" resultType="int">
+        SELECT COUNT(*) FROM Trade_Favorite
+        WHERE postID = #{postID}
+        AND userNumber = #{userNumber}
+    </select>
+
+    <!-- 찜 추가 -->
+    <insert id="tradePostAddFavorite">
+        INSERT INTO Trade_Favorite (favoriteID, postID, userNumber)
+        VALUES (seqFavoriteID.NEXTVAL, #{postID}, #{userNumber})
+    </insert>
+
+    <!-- 찜 삭제 -->
+    <delete id="tradePostRemoveFavorite">
+        DELETE FROM Trade_Favorite 
+        WHERE postID = #{postID} AND userNumber = #{userNumber}
+    </delete>
+
+    <!-- 거래 상태 업데이트 -->
+    <update id="updateTradeStatus">
+        UPDATE Trade_Post
+        SET status = #{status}
+        WHERE postID = #{postID}
+    </update>
+
+    <!-- 판매중인 다른 게시글 조회 -->
+    <select id="getAvailablePosts" parameterType="hashmap" resultType="com.boot.trade.dto.TradePostDTO">
+        <![CDATA[
+        SELECT 
+            postID,
+            userNumber,
+            userName,
+            title,
+            content,
+            price,
+            bookMajorCategory,
+            bookSubCategory,
+            location,
+            status,
+            viewCount,
+            createdAt,
+            updatedAt
+        FROM (
+            SELECT 
+                p.postID,
+                p.userNumber,
+                u.userName,
+                p.title,
+                p.content,
+                p.price,
+                p.bookMajorCategory,
+                p.bookSubCategory,
+                p.location,
+                p.status,
+                p.viewCount,
+                p.createdAt,
+                p.updatedAt
+            FROM 
+                Trade_Post p
+            JOIN 
+                userinfo u ON p.userNumber = u.userNumber
+            WHERE 
+                p.userNumber = (SELECT userNumber FROM Trade_Post WHERE postID = #{postID})
+                AND p.postID != #{postID}
+                AND p.status = 'AVAILABLE'
+            ORDER BY 
+                p.createdAt DESC
+        ) WHERE ROWNUM <= 5
+        ]]>
+    </select>
+
+    <!-- 게시글의 좋아요 수 조회 -->
+    <select id="getLikeCountByPostID" parameterType="int" resultType="int">
+        SELECT COUNT(*) 
+        FROM Trade_Favorite
+        WHERE postID = #{postID}
+    </select>
+
+    <!-- 게시글의 채팅 수 조회 -->
+    <select id="getChatCountByPostID" parameterType="int" resultType="int">
+        SELECT COUNT(DISTINCT roomID) 
+        FROM Trade_ChatRoom
+        WHERE postID = #{postID}
+    </select>
+
+    <!-- 게시글 ID로 게시글 조회 -->
+    <select id="getTradePostById" parameterType="Long" resultType="com.boot.trade.dto.TradePostDTO">
+        SELECT 
+            p.POSTID as postID,
+            p.USERNUMBER as userNumber,
+            u.USERNAME as userName,
+            p.TITLE as title,
+            p.CONTENT as content,
+            p.PRICE as price,
+            p.LOCATION as location,
+            p.BOOKMAJORCATEGORY as bookMajorCategory,
+            p.BOOKSUBCATEGORY as bookSubCategory,
+            p.STATUS as status,
+            p.VIEWCOUNT as viewCount,
+            p.CREATEDAT as createdAt,
+            p.UPDATEDAT as updatedAt
+        FROM 
+            TRADE_POST p
+        LEFT JOIN 
+            USERINFO u ON p.USERNUMBER = u.USERNUMBER
+        WHERE 
+            p.POSTID = #{postID}
+    </select>
+</mapper>

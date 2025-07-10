@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+    <!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+    <mapper namespace="com.boot.notification.dao.NotificationDao">
+        <!-- 시퀀스에서 ID 가져오기 -->
+        <select id="getNextId" resultType="int">
+            SELECT NOTIFICATIONS_SEQ.NEXTVAL FROM DUAL
+        </select>
+
+        <!-- 알림 삽입 -->
+        <insert id="insertNotification" parameterType="com.boot.notification.dto.NotificationDto">
+            INSERT INTO NOTIFICATIONS
+            (id, user_number, message, title, url, type, created_at, sent, read)
+            VALUES
+            (#{id}, #{userNumber}, #{message}, #{title}, #{url}, #{type},
+            <choose>
+                <when test="createdAt != null">#{createdAt}</when>
+                <otherwise>SYSTIMESTAMP</otherwise>
+            </choose>,
+            <choose>
+                <when test="sent">1</when>
+                <otherwise>0</otherwise>
+            </choose>,
+            <choose>
+                <when test="read">1</when>
+                <otherwise>0</otherwise>
+            </choose>)
+        </insert>
+
+        <!-- 미전송 알림 조회 (특정 사용자) -->
+        <select id="selectUnsentByUserNumber" parameterType="int" resultMap="notificationResultMap">
+            SELECT
+            id,
+            user_number,
+            message,
+            title,
+            url,
+            type,
+            created_at,
+            sent,
+            read
+            FROM NOTIFICATIONS
+            WHERE user_number = #{userNumber} AND sent = 0
+            ORDER BY created_at DESC
+        </select>
+
+        <!-- 알림 결과 매핑 -->
+        <resultMap id="notificationResultMap" type="com.boot.notification.dto.NotificationDto">
+            <id property="id" column="id"/>
+            <result property="userNumber" column="user_number"/>
+            <result property="message" column="message"/>
+            <result property="title" column="title"/>
+            <result property="url" column="url"/>
+            <result property="type" column="type"/>
+            <result property="createdAt" column="created_at"/>
+            <result property="sent" column="sent" javaType="boolean" jdbcType="NUMERIC"
+                    typeHandler="org.apache.ibatis.type.BooleanTypeHandler"/>
+            <result property="read" column="read" javaType="boolean" jdbcType="NUMERIC"
+                    typeHandler="org.apache.ibatis.type.BooleanTypeHandler"/>
+        </resultMap>
+
+        <!-- 특정 사용자의 모든 알림 조회 (페이지네이션) -->
+        <select id="selectAllByUserNumber" resultMap="notificationResultMap">
+            SELECT
+            id,
+            user_number,
+            message,
+            title,
+            url,
+            type,
+            created_at,
+            sent,
+            read
+            FROM (
+            SELECT ROW_NUMBER() OVER (ORDER BY created_at DESC) AS rnum, n.*
+            FROM NOTIFICATIONS n
+            WHERE user_number = #{userNumber}) WHERE rnum BETWEEN #{offset} + 1 AND #{offset} + #{limit}
+        </select>
+
+        <!-- 특정 사용자의 읽지 않은 알림 수 조회 -->
+        <select id="countUnreadByUserNumber" parameterType="int" resultType="int">
+            SELECT COUNT(*) FROM NOTIFICATIONS
+            WHERE user_number = #{userNumber} AND read = 0
+        </select>
+
+        <!-- 특정 알림 상세 조회 -->
+        <select id="selectNotificationById" parameterType="int" resultMap="notificationResultMap">
+            SELECT
+            id,
+            user_number,
+            message,
+            title,
+            url,
+            type,
+            created_at,
+            sent,
+            read
+            FROM NOTIFICATIONS
+            WHERE id = #{id}
+        </select>
+
+        <!-- 알림을 보낸 상태로 변경 -->
+        <update id="markAsSent" parameterType="int">
+            UPDATE NOTIFICATIONS SET sent = 1 WHERE id = #{id}
+        </update>
+
+        <!-- 알림을 읽음 상태로 변경 -->
+        <update id="markAsRead" parameterType="int">
+            UPDATE NOTIFICATIONS SET read = 1 WHERE id = #{id}
+        </update>
+
+        <!-- 알림 타입별 조회 -->
+        <select id="selectByUserNumberAndType" resultMap="notificationResultMap">
+            SELECT
+            id,
+            user_number,
+            message,
+            title,
+            url,
+            type,
+            created_at,
+            sent,
+            read
+            FROM NOTIFICATIONS
+            WHERE user_number = #{userNumber} AND type = #{type}
+            ORDER BY created_at DESC
+        </select>
+
+        <!-- 알림 제목으로 검색 -->
+        <select id="searchByTitle" resultMap="notificationResultMap">
+            SELECT
+            id,
+            user_number,
+            message,
+            title,
+            url,
+            type,
+            created_at,
+            sent,
+            read
+            FROM NOTIFICATIONS
+            WHERE user_number = #{userNumber} AND title LIKE '%' || #{keyword} || '%'
+            ORDER BY created_at DESC
+        </select>
+
+        <!-- 특정 사용자의 알림 모두 읽음 처리 -->
+        <update id="markAllAsRead" parameterType="int">
+            UPDATE NOTIFICATIONS SET read = 1
+            WHERE user_number = #{userNumber} AND read = 0
+        </update>
+
+        <!-- 오래된 알림 삭제 (특정 날짜 이전) -->
+        <delete id="deleteOldNotifications" parameterType="int">
+            DELETE FROM NOTIFICATIONS
+            WHERE created_at &lt; SYSTIMESTAMP - INTERVAL '#{days}' DAY
+        </delete>
+
+        <!-- 완전히 삭제 -->
+        <delete id="deleteNotification" parameterType="int">
+            DELETE FROM NOTIFICATIONS WHERE id = #{id}
+        </delete>
+    </mapper>

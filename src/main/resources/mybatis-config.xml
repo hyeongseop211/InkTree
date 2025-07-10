@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<mappers>
+		<!-- 수정 필요 -->
+		<mapper resource="mybatis/mappers/boardCommentMapper.xml"/>
+		<mapper resource="mybatis/mappers/boardMapper.xml"/>
+		<mapper resource="mybatis/mappers/userMapper.xml"/>
+		<mapper resource="mybatis/mappers/noticeMapper.xml"/>
+		<mapper resource="mybatis/mappers/bookMapper.xml"/>
+		<mapper resource="mybatis/mappers/bookReviewMapper.xml"/>
+		<mapper resource="mybatis/mappers/bookRecommendMapper.xml"/>
+		<mapper resource="mybatis/mappers/bookWishlistMapper.xml"/>
+		<mapper resource="mybatis/mappers/utilMapper.xml"/>
+		<mapper resource="mybatis/mappers/TradePostMapper.xml"/>
+		<mapper resource="mybatis/mappers/TradeFavoriteMapper.xml"/>
+		<mapper resource="mybatis/mappers/adminActivityLogMapper.xml"/>
+		<mapper resource="mybatis/mappers/ChatRoomMapper.xml"/>
+		<mapper resource="mybatis/mappers/ChatMessageMapper.xml"/>
+		<mapper resource="mybatis/mappers/socialUserMapper.xml"/>
+		<mapper resource="mybatis/mappers/NotificationMapper.xml"/>
+	</mappers>
+</configuration>

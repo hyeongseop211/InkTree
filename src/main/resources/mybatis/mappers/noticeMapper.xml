@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.boot.board.dao.NoticeDAO">
+	<!-- 공지사항 전체 -->
+<!--	<select id="NoticeView"-->
+<!--		resultType="com.boot.board.dto.NoticeDTO">-->
+<!--		select noticeNum, noticeWriter, noticeCategory-->
+<!--		,noticeTitle,-->
+<!--		noticeContent,-->
+<!--		noticeRegdate, noticeViews-->
+<!--		from notice-->
+<!--		order by noticeRegdate desc-->
+<!--	</select>-->
+	<select id="NoticeView"
+		resultType="com.boot.board.dto.NoticeDTO">
+		<![CDATA[
+		    SELECT noticeNum, noticeWriter, noticeCategory, noticeTitle, noticeContent, noticeRegdate, noticeViews
+		    FROM (
+		        SELECT rownum as rn, noticeNum, noticeWriter, noticeCategory, noticeTitle, noticeContent, noticeRegdate, noticeViews
+		        FROM (
+		            SELECT noticeNum, noticeWriter, noticeCategory, noticeTitle, noticeContent, noticeRegdate, noticeViews
+		            FROM notice
+		            ORDER BY noticeRegdate DESC
+		        ) a
+		        where rownum <= (#{pageNum} * #{amount})
+		    )aa
+		    where rn > (#{pageNum} - 1) * #{amount}
+		]]>
+	</select>
+
+	<!-- 공지사항 작성 -->
+	<insert id="NoticeWrite">
+		insert into
+		notice(noticeNum,noticeTitle,noticeContent,noticeCategory)
+		values
+		((SELECT NVL(MAX(NOTICENUM), 0) + 1
+		FROM NOTICE), #{noticeTitle},
+		#{noticeContent},#{noticeCategory} )
+	</insert>
+    <select id="getTotalCount" resultType="int">
+    	select count(*) from notice
+    </select>
+	<!-- 공지사항 디테일 -->
+	<select id="NoticeDetailView"
+		resultType="com.boot.board.dto.NoticeDTO">
+		select noticeNum, noticeWriter, noticeTitle, noticeContent,
+		noticeRegdate, noticeViews, noticeCategory
+		from notice
+		where
+		noticeNum=#{noticeNum}
+	</select>
+
+	<!-- 공지사항 수정 -->
+	<update id="NoticeModify">
+		update notice set noticeTitle=#{noticeTitle},
+		noticeContent=#{noticeContent}, noticeCategory=#{noticeCategory} where
+		noticeNum=#{noticeNum}
+	</update>
+
+	<!-- 공지사항 삭제 -->
+	<update id="NoticeDelete">
+		delete from notice where noticeNum=#{noticeNum}
+	</update>
+
+	<!-- 공지사항 조회수 -->
+	<update id="NoticeHit">
+		UPDATE notice
+		SET noticeViews = NVL(noticeViews, 0) +
+		1
+		WHERE noticeNum = #{noticeNum}
+	</update>
+	<select id="getAllCategoryCounts" resultType="java.util.HashMap">
+    SELECT 
+        COUNT(*) "total",
+        SUM(CASE WHEN NOTICECATEGORY = 'important' THEN 1 ELSE 0 END) "important",
+        SUM(CASE WHEN NOTICECATEGORY = 'event' THEN 1 ELSE 0 END) "event",
+        SUM(CASE WHEN NOTICECATEGORY = 'info' THEN 1 ELSE 0 END) "info",
+        SUM(CASE WHEN NOTICECATEGORY = 'update' THEN 1 ELSE 0 END) "update"
+    FROM notice
+</select>
+</mapper>

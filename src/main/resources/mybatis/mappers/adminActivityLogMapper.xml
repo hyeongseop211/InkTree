@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.boot.user.dao.AdminActivityLogDAO">
+    <!-- 활동 로그 추가 -->
+    <insert id="insertActivityLog" parameterType="com.boot.user.dto.AdminActivityLogDTO">
+        INSERT INTO ACTIVITY_LOG (
+            activity_type, 
+            actor_type, 
+            actor_id, 
+            actor_name, 
+            target_name, 
+            description, 
+            log_date
+        ) VALUES (
+            #{activityType}, 
+            #{actorType}, 
+            #{actorId}, 
+            #{actorName}, 
+            #{targetName}, 
+            #{description}, 
+            #{logDate, jdbcType=TIMESTAMP}
+        )
+    </insert>
+
+    <!-- 최근 활동 로그 조회 -->
+    <select id="getRecentActivities" parameterType="int" resultType="com.boot.user.dto.AdminActivityLogDTO">
+        SELECT * FROM (
+            SELECT 
+                log_id AS logId,
+                activity_type AS activityType,
+                actor_type AS actorType,
+                actor_id AS actorId,
+                actor_name AS actorName,
+                target_name AS targetName,
+                description,
+                log_date AS logDate
+            FROM 
+                ACTIVITY_LOG
+            ORDER BY 
+                log_date DESC
+        ) WHERE ROWNUM &lt;= #{limit}
+    </select>
+    
+    <!-- 특정 유형의 활동 로그 조회 -->
+    <select id="getActivitiesByType" resultType="com.boot.user.dto.AdminActivityLogDTO">
+        SELECT * FROM (
+            SELECT 
+                log_id AS logId,
+                activity_type AS activityType,
+                actor_type AS actorType,
+                actor_id AS actorId,
+                actor_name AS actorName,
+                target_name AS targetName,
+                description,
+                log_date AS logDate
+            FROM 
+                ACTIVITY_LOG
+            WHERE 
+                activity_type = #{activityType}
+            ORDER BY 
+                log_date DESC
+        ) WHERE ROWNUM &lt;= #{limit}
+    </select>
+    
+    <!-- 모든 활동 로그 조회 (페이징 처리) -->
+    <select id="getAllActivities" parameterType="com.boot.z_page.criteria.AdminActivityLogCriteriaDTO" resultType="com.boot.user.dto.AdminActivityLogDTO">
+        SELECT * FROM (
+            SELECT a.*, ROWNUM rn
+            FROM (
+                SELECT 
+                    l.log_id AS logId,
+                    l.activity_type AS activityType,
+                    l.actor_type AS actorType,
+                    l.actor_id AS actorId,
+                    l.actor_name AS actorName,
+                    l.target_name AS targetName,
+                    l.description,
+                    l.log_date AS logDate
+                FROM 
+                    ACTIVITY_LOG l
+                <where>
+                    <if test="activityType != null and activityType != ''">
+                        l.activity_type = #{activityType}
+                    </if>
+                    <if test="categoryFilter != null and categoryFilter != ''">
+                        <![CDATA[
+                        AND EXISTS (
+                            SELECT 1 
+                            FROM DUAL 
+                            WHERE l.activity_type IN (
+                                'book_add', 'book_modify', 'book_delete'
+                            ) AND #{categoryFilter} = 'admin_book'
+                            OR l.activity_type IN (
+                                'book_borrow', 'book_return'
+                            ) AND #{categoryFilter} = 'user_book'
+                            OR l.activity_type IN (
+                                'notice_add', 'notice_modify', 'notice_delete'
+                            ) AND #{categoryFilter} = 'notice'
+                            OR l.activity_type IN (
+                                'user_add', 'user_modify'
+                            ) AND #{categoryFilter} = 'user'
+                        )
+                        ]]>
+                    </if>
+                    <if test="actorType != null and actorType != ''">
+                        AND l.actor_type = #{actorType}
+                    </if>
+                </where>
+                ORDER BY 
+                    l.log_date DESC
+            ) a
+            WHERE ROWNUM &lt;= #{pageNum} * #{amount}
+        ) WHERE rn > (#{pageNum} - 1) * #{amount}
+    </select>
+    
+    <!-- 총 로그 수 조회 -->
+    <select id="getTotalLogCount" parameterType="com.boot.z_page.criteria.AdminActivityLogCriteriaDTO" resultType="int">
+        SELECT 
+            COUNT(*)
+        FROM 
+            ACTIVITY_LOG l
+        <where>
+            <if test="activityType != null and activityType != ''">
+                l.activity_type = #{activityType}
+            </if>
+            <if test="categoryFilter != null and categoryFilter != ''">
+                <![CDATA[
+                AND EXISTS (
+                    SELECT 1 
+                    FROM DUAL 
+                    WHERE l.activity_type IN (
+                        'book_add', 'book_modify', 'book_delete'
+                    ) AND #{categoryFilter} = 'admin_book'
+                    OR l.activity_type IN (
+                        'book_borrow', 'book_return'
+                    ) AND #{categoryFilter} = 'user_book'
+                    OR l.activity_type IN (
+                        'notice_add', 'notice_modify', 'notice_delete'
+                    ) AND #{categoryFilter} = 'notice'
+                    OR l.activity_type IN (
+                        'user_add', 'user_modify'
+                    ) AND #{categoryFilter} = 'user'
+                )
+                ]]>
+            </if>
+            <if test="actorType != null and actorType != ''">
+                AND l.actor_type = #{actorType}
+            </if>
+        </where>
+    </select>
+</mapper> 

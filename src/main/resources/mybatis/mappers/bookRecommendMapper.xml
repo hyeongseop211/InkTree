@@ -1,0 +1,22 @@
+
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.boot.book.dao.BookRecommendDAO">
+
+<!--  소분류별 5개 추천 도서  -->
+<select id="Top5Recommend" resultType="com.boot.book.dto.BookDTO">
+<![CDATA[ SELECT * FROM ( SELECT b.*, ROW_NUMBER() OVER ( PARTITION BY b.booksubcategory ORDER BY b.bookborrowcount DESC ) AS rn FROM bookinfo b WHERE b.booksubcategory IN ( SELECT booksubcategory FROM ( SELECT COUNT(*) AS count, booksubcategory FROM book_record WHERE usernumber = ${userNumber} GROUP BY booksubcategory ORDER BY count DESC ) WHERE ROWNUM <= ${majorCategoryNumber} ) ) WHERE rn <= ${rn} ]]>
+</select>
+<!--  상위 3개 대출 도서  -->
+<select id="Top3Borrow" resultType="com.boot.book.dto.BookDTO">
+<![CDATA[ SELECT bookNumber, bookIsbn, bookTitle, bookComent, bookWrite, bookPub, bookDate, SUBSTR(bookMajorCategory, INSTR(bookMajorCategory, '-') + 1) AS bookMajorCategory, SUBSTR(bookSubCategory, INSTR(bookSubCategory, '-') + 1) AS bookSubCategory, bookCount, bookBorrowCount FROM ( SELECT * FROM bookinfo ORDER BY bookBorrowCount DESC ) WHERE ROWNUM <= 3 ]]>
+</select>
+<!--  대분류별 5개 도서  -->
+<select id="Top5Random" resultType="com.boot.book.dto.BookDTO">
+<![CDATA[ SELECT * FROM ( SELECT b.*, ROW_NUMBER() OVER ( PARTITION BY b.bookmajorcategory ORDER BY b.bookborrowcount DESC ) AS rn FROM bookinfo b WHERE b.bookmajorcategory IN ( SELECT bookmajorcategory FROM ( SELECT COUNT(*) AS count, bookmajorcategory FROM book_record WHERE usernumber = ${userNumber} GROUP BY bookmajorcategory ORDER BY count DESC ) WHERE ROWNUM <= ${majorCategoryNumber} ) ) WHERE rn <= ${rn} ]]>
+</select>
+<select id="CategoryNum" resultType="String"> select count(*) as count from( SELECT COUNT(*) AS count, bookmajorcategory FROM book_record WHERE usernumber = ${userNumber} GROUP BY bookmajorcategory ORDER BY count DESC) </select>
+
+</mapper>
